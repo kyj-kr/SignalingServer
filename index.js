@@ -54,7 +54,7 @@ io.sockets.on('connection', function(socket) {
     var ifaces = os.networkInterfaces();
     for (var dev in ifaces) {
       ifaces[dev].forEach(function(details) {
-        if (details.family === 'IPv4' && details.address !== '127.0.0.1' && details.address !== '10.173.1.175') {
+        if (details.family === 'IPv4' && details.address !== '127.0.0.1' && details.address !== '118.67.128.225') {
           socket.emit('ipaddr', details.address);
         }
       });
