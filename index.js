@@ -27,6 +27,7 @@ io.sockets.on('connection', function(socket) {
     socket.broadcast.emit('message', message);
   });
 
+  // room에 roomId를 넣어서 1:1의 공간을 만들 수 있다.
   socket.on('create or join', function(room) {
     log('Received request to create or join room ' + room);
 
@@ -61,8 +62,8 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('bye', function(){
-    console.log('received bye');
+  socket.on('bye', function(room) {
+    io.sockets.in(room).emit('bye');
   });
 
 });
