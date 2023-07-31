@@ -21,10 +21,11 @@ io.sockets.on('connection', function(socket) {
     socket.emit('log', array);
   }
 
-  socket.on('message', function(message) {
+  socket.on('message', function(message, room) {
     log('Client said: ', message);
     // for a real app, would be room-only (not broadcast)
-    socket.broadcast.emit('message', message);
+    // socket.broadcast.emit('message', message);
+    io.sockets.in(room).emit('message', message)
   });
 
   // room에 roomId를 넣어서 1:1의 공간을 만들 수 있다.
@@ -59,6 +60,18 @@ io.sockets.on('connection', function(socket) {
           socket.emit('ipaddr', details.address);
         }
       });
+    }
+  });
+
+  socket.on('standby', function(room) {
+    log("Standby " + room);
+
+    var clientsInRoom = io.sockets.adapter.rooms[room];
+    var numClients = clientsInRoom ? Object.keys(clientsInRoom.sockets).length : 0;
+
+    if (numClients == 1) {
+      log('standby and join room');
+      socket.join(room)
     }
   });
 
