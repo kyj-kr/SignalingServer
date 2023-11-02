@@ -38,15 +38,17 @@ io.sockets.on('connection', function(socket) {
 
     if (numClients === 0) {
       socket.join(room);
+      socket.roomName = room
       log('Client ID ' + socket.id + ' created room ' + room);
       socket.emit('created', room, socket.id);
 
     } else if (numClients === 1) {
       log('Client ID ' + socket.id + ' joined room ' + room);
-      io.sockets.in(room).emit('join', room);
+      io.sockets.in(room).emit('join', room); // room에 속한 모두에게 join 전송
       socket.join(room);
-      socket.emit('joined', room, socket.id);
-      io.sockets.in(room).emit('ready');
+      socket.roomName = room
+      socket.emit('joined', room, socket.id); // 본인에게 joined 전송
+      io.sockets.in(room).emit('ready'); // room에 속한 모두에게 ready 전송
     } else { // max two clients
       socket.emit('full', room);
     }
@@ -78,5 +80,9 @@ io.sockets.on('connection', function(socket) {
   socket.on('bye', function(room) {
     io.sockets.in(room).emit('bye');
   });
+
+  socket.on('disconnect', function() {
+    io.sockets.in(socket.roomName).emit('termination')
+  }
 
 });
