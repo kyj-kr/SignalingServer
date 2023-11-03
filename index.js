@@ -11,7 +11,11 @@ var app = http.createServer(function(req, res) {
   fileServer.serve(req, res);
 }).listen(port);
 
-var io = socketIO.listen(app);
+var io = socketIO(app, {
+  pingInterval: 30000,
+  pingTimeout: 400000000
+});
+
 io.sockets.on('connection', function(socket) {
 
   // convenience function to log server messages on the client
@@ -25,7 +29,7 @@ io.sockets.on('connection', function(socket) {
     log('Client said: ', message);
     // for a real app, would be room-only (not broadcast)
     // socket.broadcast.emit('message', message);
-    io.sockets.in(room).emit('message', message)
+    socket.broadcast.to(room).emit('message', message);
   });
 
   // room에 roomId를 넣어서 1:1의 공간을 만들 수 있다.
@@ -83,6 +87,6 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('disconnect', function() {
     io.sockets.in(socket.roomName).emit('termination')
-  }
+  });
 
 });
